@@ -1,0 +1,30 @@
+= SocialBeat
+
+A proof of concept social crowd beat visualization thing, inspired by Giles Bowkett's RubyFringe talk. It is driven by HTTP requests.
+
+= Install
+
+  git clone git://github.com/jashkenas/ruby-processing.git # You need this
+  git clone git://github.com/xaviershay/socialbeat.git
+
+= Usage
+
+  RUBY_PROCESSING_PATH=~/Code/ruby-processing ruby run.rb
+
+  You want a constant beat POSTing to /beats
+  Then whenever anyone hits something, you want to POST to /bangs
+
+  For playing around, run:
+
+  ruby tick.rb # In the background
+  ruby bang.rb # Whenever the groove says to
+
+= Other
+
+  So it would be cool if /beats was actually driven by a MIDI source, then it should wire straight into your existing Beat Machinez. First port of call for investigating this would be Pete Yandell's SimpleSynth, I think.
+
+  I have no artistic talent, so it will forever look like ass unless someone else gives some direction.
+
+  It's a bit of a Rube-Goldberg machine at the moment - I have no idea what loads when as far as the sketch and rack are concerned.
+
+  If you displayed beats a phrase late you could collate the data and account for latency and cool stuff like that - you'd probably want to display a phrase rather than a bar at it currently does
