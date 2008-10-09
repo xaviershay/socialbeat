@@ -20,3 +20,11 @@ A proof of concept social crowd beat visualization thing, inspired by Giles Bowk
   * Pretty much everything
   * Still needs to be hooked up to rbcoremidi so it can accept MIDI input
   * Canvas::OpenGl needs to be fleshed out so you can actually draw cool stuff
+
+= Architecture
+
+  A subclass of SocialBeat::Artist is instantiated on the fly, as the code file changes.
+  This instance is responsible for drawing and update logic. It is totally stateless - any state it wishes to
+  keep should be stored in the env variable that is passed to it by SocialBeat::Runner
+  This allows the hot swapping to work.
+  Any drawing should be done on the canvas object, so that OpenGl can easily be switched out for processing/directX/AWESOMEASCIIART/whatever
