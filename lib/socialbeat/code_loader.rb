@@ -32,12 +32,11 @@ class CodeLoader
     def load_file(file)
       if File.exists?(file) && File.mtime(file).to_i > @mtime
         begin
-          file = @file_name
           m = Module.new
           m.instance_eval do
             load(file)
           end
-          klass = m.const_get('Simple') # TODO
+          klass = m.const_get(File.basename(file, ".rb").gsub(/(?:\b|_)(\w)/) { $1.upcase })
           @mtime = File.mtime(file).to_i
           @instance = klass.new
           @on_load[@instance]
