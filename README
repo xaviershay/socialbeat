@@ -1,0 +1,22 @@
+= SocialBeat
+
+A proof of concept social crowd beat visualization thing, inspired by Giles Bowkett's RubyFringe talk.
+
+= Install
+
+  gem install ruby-opengl
+
+= Usage
+
+  ruby run.rb artists/simple.rb
+  vim artist/simple.rb # Try changing the target color and watch it morph on the fly. oooooooooh.
+
+= Current state
+
+  DONE
+  * Hot reloads your artist file
+
+  TODO  
+  * Pretty much everything
+  * Still needs to be hooked up to rbcoremidi so it can accept MIDI input
+  * Canvas::OpenGl needs to be fleshed out so you can actually draw cool stuff
