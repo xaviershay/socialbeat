@@ -1,4 +1,4 @@
-class Simple < SocialBeat::Artist
+class self::Simple < SocialBeat::Artist
   # Ensure that everything you want in the environment is there
   # Data may already exist from a previous artist
   def setup_environment(env)

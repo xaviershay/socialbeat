@@ -34,9 +34,10 @@ class CodeLoader
         begin
           m = Module.new
           m.instance_eval do
-            load(file)
+            eval(File.read(file))
           end
-          klass = m.const_get(File.basename(file, ".rb").gsub(/(?:\b|_)(\w)/) { $1.upcase })
+
+          klass = m.const_get(m.constants.first)
           @mtime = File.mtime(file).to_i
           @instance = klass.new
           @on_load[@instance]
