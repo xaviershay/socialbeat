@@ -1,0 +1,8 @@
+desc "Run all specs"
+task :spec do
+  Dir['spec/*.rb'].reject {|f| f == 'stories/spec_helper.rb'}.each do |spec|
+    load spec
+  end
+end
+
+task :default => :spec
