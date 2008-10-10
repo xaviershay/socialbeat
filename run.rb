@@ -1,3 +1,4 @@
+$LOAD_PATH.unshift('vendor/rbcoremidi')
 $LOAD_PATH.unshift('lib')
 require 'rubygems'
 require 'socialbeat'
