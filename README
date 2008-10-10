@@ -2,23 +2,30 @@
 
 A proof of concept social crowd beat visualization thing, inspired by Giles Bowkett's RubyFringe talk.
 
+Only works on OSX, maybe only on Leopard
+
 = Install
 
-  gem install ruby-opengl
+  /usr/bin/gem install ruby-opengl # Note the use of system ruby (not ports or anything). Needed for rbcoremidi.
 
 = Usage
 
-  ruby run.rb artists/simple.rb
-  vim artist/simple.rb # Try changing the target color and watch it morph on the fly. oooooooooh.
+  # Start archaeopteryx 
+  # Open MIDI Patch Bay.app
+  # Create a new input ("Archaeopteryx")
+  # Create a new output ("SocialBeat")
+
+  /usr/bin/ruby run.rb artists/simple.rb
+  vim artist/simple.rb # Try changing the base_color and watch it morph on the fly. oooooooooh.
 
 = Current state
 
   DONE
   * Hot reloads your artist file
+  * Accepts MIDI input
 
   TODO  
   * Pretty much everything
-  * Still needs to be hooked up to rbcoremidi so it can accept MIDI input
   * Canvas::OpenGl needs to be fleshed out so you can actually draw cool stuff
 
 = Architecture

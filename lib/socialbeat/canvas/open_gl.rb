@@ -46,13 +46,14 @@ class OpenGl
     Gl.glViewport(0, 0, w, h);
     Gl.glMatrixMode(Gl::GL_PROJECTION);
     Gl.glLoadIdentity();
-    if (w <= h) 
-      Gl.glOrtho(-1.5, 1.5, -1.5*h/w, 1.5*h/w, -10.0, 10.0);
-    else 
-      Gl.glOrtho(-1.5*w/h, 1.5*w/h, -1.5, 1.5, -10.0, 10.0);
-    end
+    Gl.glOrtho(-w/2.0, w/2.0, -h/2.0, h/2.0, -10.0, 10.0)
     Gl.glMatrixMode(Gl::GL_MODELVIEW);
+
+    self.width = w
+    self.height = h
   end
+
+  attr_accessor :width, :height
 
 
   # Drawing!
@@ -63,6 +64,8 @@ class OpenGl
   def circle(x, y, r)
     # Uhm yeah so this isn't really a circle yet
     Gl.glPushMatrix();
+      glTranslatef(x, y, 0);
+      glScale(r, r, 0)
       Gl.glBegin(Gl::GL_QUADS);
       Gl.glNormal(0.0, 0.0, 1.0);
       Gl.glVertex(-1.0, -1.0, 0.0);
