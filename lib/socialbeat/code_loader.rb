@@ -43,8 +43,8 @@ class CodeLoader
             @mtime = mtime 
             @instance = klass.new
             @on_load[@instance]
-          rescue SyntaxError, LoadError, Errno::ENOENT
-            @on_error[]
+          rescue NameError, SyntaxError, LoadError, Errno::ENOENT => e
+            @on_error[e]
           end
         end
       else

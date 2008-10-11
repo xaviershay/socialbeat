@@ -26,7 +26,7 @@ module SocialBeat
             puts e
           end
         },
-        :on_error => L{ puts "Load error!" }
+        :on_error => L{|e| puts "Load error: #{e}" }
       )
 
       @midi_events = []

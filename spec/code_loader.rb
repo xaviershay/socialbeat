@@ -38,6 +38,19 @@ describe SocialBeat::CodeLoader do
       file
     end
 
+    def load_class(src, options = {})
+      file = new_foo_file!
+
+      loader = SocialBeat::CodeLoader.new(file.path, 
+        :on_load  => (options[:on_load]  || L{}).to_proc,
+        :on_error => (options[:on_error] || L{}).to_proc
+      )
+      File.open(file.path, 'w') {|f| f.write(src) }
+      loader.update(SocialBeat::CodeLoader::FILE_REFRESH_TIME + 1)
+      loader
+    end
+
+
     it 'accumulates the passed u time until FILE_REFRESH_TIME is elapsed' do
       File.stub!(:mtime).and_return(*(1..10000).to_a) 
       file = new_foo_file!
@@ -61,55 +74,68 @@ describe SocialBeat::CodeLoader do
       end
 
       it 'reloads class file and stores a new instance of the class' do
-        file = new_foo_file!
-        loader = SocialBeat::CodeLoader.new(file.path)
-
-        File.open(file.path, 'w') {|f| f.write(fake_class('bar')) }
-        loader.update(SocialBeat::CodeLoader::FILE_REFRESH_TIME + 1)
+        loader = load_class(fake_class('bar'))
         loader.current_instance.what.should == 'bar'
       end
 
       it 'calls the on_load method with the new instance' do
-        obj = nil
-        test_lambda = L{|instance| obj = instance}
+        on_load = ExecutedCounter.new(L{|instance| 
+          instance.what.shoud == 'bar'
+        })
 
-        file = new_foo_file!
-
-        loader = SocialBeat::CodeLoader.new(file.path, :on_load => test_lambda)
-        File.open(file.path, 'w') {|f| f.write(fake_class('bar')) }
-        loader.update(SocialBeat::CodeLoader::FILE_REFRESH_TIME + 1)
-
-        obj.should_not be_nil
-        obj.what.should == 'bar'
+        load_class(fake_class('bar'), :on_load => on_load)
+        on_load.should be_called
       end
 
-      it 'calls the on_error method and keeps the old instance if the file has a syntax error' do
-        called = false 
-        test_lambda = L{ called = true }
+      describe 'when the file has a syntax error' do
+        it 'passes the exception to the on_error method' do
+          on_error = ExecutedCounter.new(L{|exception|
+              exception.class.should == SyntaxError
+          })
 
-        file = new_foo_file!
+          load_class(fake_class('bar"r'), :on_error => on_error)
 
-        loader = SocialBeat::CodeLoader.new(file.path, :on_error => test_lambda)
-        File.open(file.path, 'w') {|f| f.write(fake_class('ba"r')) }
-        loader.update(SocialBeat::CodeLoader::FILE_REFRESH_TIME + 1)
+          on_error.should be_called
+        end
 
-        called.should == true
-        loader.current_instance.what.should == 'foo'
+        it 'keeps the old instance' do
+          loader = load_class(fake_class('bar"r'))
+          loader.current_instance.what.should == 'foo'
+        end
+      end
+
+      describe 'when the file has a name error' do
+        setup do
+          @src = "a = invalid"
+        end
+
+        it 'passes the exception to the on_error method' do
+          on_error = ExecutedCounter.new(L{|exception|
+              exception.class.should == NameError
+          })
+
+          load_class(@src, :on_error => on_error)
+
+          on_error.should be_called
+        end
+
+        it 'keeps the old instance' do
+          loader = load_class(@src)
+          loader.current_instance.what.should == 'foo'
+        end
       end
     end
 
     describe 'when file refresh time has elapsed and file does not exist' do
       it 'calls the on_error method and keeps the old instance' do
-        called = false 
-        test_lambda = L{ called = true }
-
         file = new_foo_file!
+        on_error = ExecutedCounter.new(L{})
 
-        loader = SocialBeat::CodeLoader.new(file.path, :on_error => test_lambda)
+        loader = SocialBeat::CodeLoader.new(file.path, :on_error => on_error.to_proc)
         file.unlink
         loader.update(SocialBeat::CodeLoader::FILE_REFRESH_TIME + 1)
 
-        called.should == true
+        on_error.should be_called
         loader.current_instance.what.should == 'foo'
       end
     end
