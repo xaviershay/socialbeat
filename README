@@ -6,7 +6,7 @@ Only works on OSX, maybe only on Leopard
 
 = Install
 
-  /usr/bin/gem install ruby-opengl # Note the use of system ruby (not ports or anything). Needed for rbcoremidi.
+  gem install ruby-opengl
 
 = Usage
 
@@ -15,8 +15,11 @@ Only works on OSX, maybe only on Leopard
   # Create a new input ("Archaeopteryx")
   # Create a new output ("SocialBeat")
 
-  /usr/bin/ruby run.rb artists/simple.rb
+  ruby run.rb artists/simple.rb
   vim artist/simple.rb # Try changing the base_color and watch it morph on the fly. oooooooooh.
+
+  If it complains about loading rbcoremidi, this means that you have to compile it yourself.
+  Grab it from github: http://github.com/xaviershay/rbcoremidi/tree/master, compile, and put the bundle into vendor/rbcoremidi
 
 = Current state
 
@@ -25,8 +28,11 @@ Only works on OSX, maybe only on Leopard
   * Accepts MIDI input
 
   TODO  
-  * Pretty much everything
+  * Some cool examples, esp with multiple inputs
+  * Nested reloading (files included from an artist)
   * Canvas::OpenGl needs to be fleshed out so you can actually draw cool stuff
+  * Make a screencast showing awesomeness
+  * Profiling and performance work
 
 = Architecture
 
