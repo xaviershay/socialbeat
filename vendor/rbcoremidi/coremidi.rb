@@ -11,11 +11,11 @@ module CoreMIDI
   end
 
   class Packet
-    attr_accessor :note, :duration, :volume
+    attr_accessor :type, :note, :volume
 
     def initialize(api_packet)
-      self.note     = api_packet.data[0]
-      self.duration = api_packet.data[1]
+      self.type     = {146 => :on, 130 => :off}[api_packet.data[0]]
+      self.note     = api_packet.data[1]
       self.volume   = api_packet.data[2]
     end
   end
