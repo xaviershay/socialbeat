@@ -19,13 +19,7 @@ module SocialBeat
       @env = {}
       @artist_loader = CodeLoader.new(artist_file,
         :default_class => Artist,
-        :on_load  => L{|artist| 
-          begin
-            artist.setup_environment(@env) 
-          rescue NoMethodError => e
-            puts e
-          end
-        },
+        :on_load  => L{|artist| send_to_reloadable(artist, :setup_environment, @env) },
         :on_error => L{|e| puts "Load error: #{e}" }
       )
 
@@ -66,11 +60,7 @@ module SocialBeat
       # This loop forces a fixed physics update step, giving us deterministic behaviour 
       while @physics_accum >= PHYSICS_STEP 
         e = @new_events.select {|x| x.timestamp <= PHYSICS_STEP }
-        begin
-          @artist_loader.current_instance.update(e, @canvas, @env, PHYSICS_STEP)
-        rescue NoMethodError, ArgumentError, TypeError, NameError => exception
-          puts exception.inspect
-        end
+        send_to_reloadable(@artist_loader.current_instance, :update, e, @canvas, @env, PHYSICS_STEP)
         @new_events -= e
         @new_events.each do |event|
           event.timestamp -= PHYSICS_STEP
@@ -87,11 +77,14 @@ module SocialBeat
       u = now - (@last_draw_time || now) 
       @last_draw_time = now
 
-      # TODO: Catch all errors
+      send_to_reloadable(@artist_loader.current_instance, :draw, @canvas, @env, u)
+    end
+
+    def send_to_reloadable(obj, method, *args)
       begin
-        @artist_loader.current_instance.draw(@canvas, @env, u)
-      rescue ArgumentError, NoMethodError => e
-        puts e.inspect
+        obj.send(method, *args)
+      rescue NoMethodError, ArgumentError, TypeError, NameError => e
+        puts e
       end
     end
   end
