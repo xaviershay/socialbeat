@@ -41,22 +41,38 @@ class OpenGl
   def refresh
     glutPostRedisplay()
   end
-  
-  def reshape(w, h)
-    Gl.glViewport(0, 0, w, h);
-    Gl.glMatrixMode(Gl::GL_PROJECTION);
-    Gl.glLoadIdentity();
-    Gl.glOrtho(-w/2.0, w/2.0, -h/2.0, h/2.0, -10.0, 10.0)
-    Gl.glMatrixMode(Gl::GL_MODELVIEW);
 
+  def reshape(w, h)
     self.width = w
     self.height = h
   end
-
+  
+  # Drawing!
+  # TODO: Only expose drawing methods to the artist, not the methods above
   attr_accessor :width, :height
 
+  def use_3d!
+    glViewport(0, 0, self.width, self.height)
+  
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity
+    # Calculate aspect ratio of the window
+    gluPerspective(45.0, self.width / self.height, 0.1, 400.0)
 
-  # Drawing!
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity
+  end
+
+  def use_2d!
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glScalef(2.0 / width, -2.0 / height, 1.0);
+    glTranslatef(-(width / 2.0), -(height / 2.0), 0.0);
+    glViewport(0, 0, width, height); 
+  end
+
   def fill(r, g, b)
     glColor(r, g, b)
   end
@@ -92,6 +108,29 @@ class OpenGl
       Gl.glVertex(-1.0, 0.0, 0.0);
       Gl.glEnd();
     Gl.glPopMatrix();
+  end
+
+  def point(*position)
+    glPushMatrix
+      glTranslate(*position)
+      size = 2.0
+      glScale(0.5, 0.5, 1.0)
+      glBegin(GL_QUADS)
+        Gl.glNormal(1.0, 1.0, 1.0);
+        Gl.glVertex(-size, -size, 0.0);
+        Gl.glVertex(size, -size, 0.0);
+        Gl.glVertex(size, size, 0.0);
+        Gl.glVertex(-size, size, 0.0);
+      glEnd
+    glPopMatrix
+  end
+
+  def look_at(eye, centre, up)
+    gluLookAt(*(eye + centre + up))
+  end
+
+  def rotate(amount, axis)
+    glRotate(amount, *axis)
   end
 end
 

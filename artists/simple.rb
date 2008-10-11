@@ -5,11 +5,12 @@ class self::Simple < SocialBeat::Artist
     env[:current_color] ||= [0.0, 0.0, 0.0]
   end
 
-  # Slowly morph the current color towards the target color
+  # Morph the current color towards the target color
   def update(events, canvas, env, u)
     events.each do |event|
-      env[:current_color] = kick_color if event.data.note == 146
+      env[:current_color] = kick_color if event.data.type == :on && event.data.note == 36
     end
+
     colors = env[:current_color]
     colors.each_with_index do |a, i|
       colors[i] += (base_color[i] - a) * u * 5
@@ -18,8 +19,9 @@ class self::Simple < SocialBeat::Artist
 
   # Draw a simple filled circle with the current color
   def draw(canvas, env, u)
+    canvas.use_2d!
     canvas.fill(*env[:current_color])
-    canvas.circle(0, 0, 50)
+    canvas.circle(canvas.width / 2, canvas.height / 2, 50)
   end
 
   protected
