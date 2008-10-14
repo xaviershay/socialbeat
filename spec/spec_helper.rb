@@ -3,6 +3,10 @@ require 'spec'
 
 alias :L :lambda
 
-$LOAD_PATH.unshift('lib')
+def F(path)
+  File.expand_path(File.join(File.dirname(__FILE__), path))
+end
+
+$LOAD_PATH.unshift(F('../lib'))
 require 'rubygems'
-require 'spec/support/executed_counter'
+require F('support/executed_counter')
