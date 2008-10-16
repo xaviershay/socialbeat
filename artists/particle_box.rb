@@ -98,7 +98,6 @@ class self::ParticleBox < SocialBeat::Artist
     env[:x] += u * 8
   end
 
-  include Gl, Glu
   def draw(canvas, env, u)
     canvas.use_3d!
     canvas.look_at([80, 80, 65], [0, 0, 0], [0, 0, 1])
