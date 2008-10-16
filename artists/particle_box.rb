@@ -17,7 +17,6 @@ class self::ParticleBox < SocialBeat::Artist
     w = Math.sqrt((-2*Math.log(w))/w)
     [ u2*w, u1*w ]
   end
-  
 
   def setup_environment(env)
     {
@@ -38,6 +37,10 @@ class self::ParticleBox < SocialBeat::Artist
     env[:x] ||= 0
     env[:plane]       = [[0, 0, 0], [0, 0, 1.0]]
     env[:click_plane] = [[0, 0, 0], [0, 0, 1.0]]
+
+    env[:colors] ||= {}
+    env[:colors][:a] ||= [0, 0, 0]
+    env[:colors][:b] ||= [0, 0, 0]
   end
 
   def op(operator, v1, v2)
@@ -86,6 +89,12 @@ class self::ParticleBox < SocialBeat::Artist
       end
     end
 
+    env[:colors].each_pair do |key, color|
+      color.each_with_index do |a, i|
+        color[i] += (target_colors[key][i] - a) * u
+      end
+    end
+
     env[:x] += u * 8
   end
 
@@ -97,13 +106,20 @@ class self::ParticleBox < SocialBeat::Artist
 
     canvas.fill(0.0, 0.0, 1.0)
     {
-      :particles       => [0.0, 0.0, 0.7],
-      :click_particles => [0.0, 0.6, 0.0]
+      :particles       => env[:colors][:a],
+      :click_particles => env[:colors][:b]
     }.each_pair do |key, color|
       canvas.fill(*color)
       env[key].each do |particle|
         canvas.point(*particle.position)
       end
     end
+  end
+
+  def target_colors
+    {
+      :a => [0.0, 0.0, 0.7],
+      :b => [0.0, 0.6, 0.0]
+    }
   end
 end
