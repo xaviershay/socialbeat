@@ -41,6 +41,11 @@ class self::ParticleBox < SocialBeat::Artist
     env[:colors] ||= {}
     env[:colors][:a] ||= [0, 0, 0]
     env[:colors][:b] ||= [0, 0, 0]
+
+    env[:target_colors] = {
+      :a => [[0.0, 0.0, 0.7], [0.5, 0.0, 0.5]],
+      :b => [[0.0, 0.6, 0.0], [0.0, 0.6, 1.0]]
+    }
   end
 
   def op(operator, v1, v2)
@@ -51,6 +56,11 @@ class self::ParticleBox < SocialBeat::Artist
   POINT = 0
   def update(events, canvas, env, u)
     events.each do |event|
+      if event.data.note == 119 && event.data.volume > 0
+        env[:target_colors].each_pair do |key, colors|
+          colors << colors.shift
+        end
+      end
       if event.data.type == :on
         env[:plane][POINT][Z] = 0.07 if event.data.note == 36
         env[:click_plane][POINT][Z] = 0.07 if event.data.note == 37
@@ -91,7 +101,7 @@ class self::ParticleBox < SocialBeat::Artist
 
     env[:colors].each_pair do |key, color|
       color.each_with_index do |a, i|
-        color[i] += (target_colors[key][i] - a) * u
+        color[i] += (env[:target_colors][key].first[i] - a) * u
       end
     end
 
@@ -113,12 +123,5 @@ class self::ParticleBox < SocialBeat::Artist
         canvas.point(*particle.position)
       end
     end
-  end
-
-  def target_colors
-    {
-      :a => [0.0, 0.0, 0.7],
-      :b => [0.0, 0.6, 0.0]
-    }
   end
 end
