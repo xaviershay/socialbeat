@@ -7,6 +7,8 @@ Only works on OSX, maybe only on Leopard
 = Install
 
   gem install ruby-opengl
+  gem sources -a http://gems.github.com
+  gem install xaviershay-rbcoremidi
 
 = Usage
 

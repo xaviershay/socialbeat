@@ -56,14 +56,15 @@ class self::ParticleBox < SocialBeat::Artist
   POINT = 0
   def update(events, canvas, env, u)
     events.each do |event|
-      if event.data.note == 119 && event.data.volume > 0
-        env[:target_colors].each_pair do |key, colors|
-          colors << colors.shift
+      if event.data.is_a?(CoreMIDI::Events::NoteOn)
+        if event.data.pitch == 119
+          env[:target_colors].each_pair do |key, colors|
+            colors << colors.shift
+          end
         end
-      end
-      if event.data.type == :on
-        env[:plane][POINT][Z] = 0.07 if event.data.note == 36
-        env[:click_plane][POINT][Z] = 0.07 if event.data.note == 37
+
+        env[:plane][POINT][Z] = 0.07 if event.data.pitch == 36
+        env[:click_plane][POINT][Z] = 0.07 if event.data.pitch == 37
       end
     end
 
