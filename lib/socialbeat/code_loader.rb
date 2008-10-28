@@ -29,17 +29,45 @@ class CodeLoader
     @instance
   end
   
+  def self.const_missing(name)
+    @@m.const_get(@@m.constants[1]).const_get(name)
+  end
+
   protected
     def load_file(file_name)
       if File.exists?(file_name)
         if (mtime = File.mtime(file_name).to_f) > @mtime
           begin
-            m = Module.new
+            @@m = m = Module.new
             m.instance_eval do
+              self::const_set('Depend', [])
+
+              def self.const_missing(name)
+                const_set(name, Class.new(SocialBeat::Artist))
+              end
+
+              def self.reloadable(cls, &blk)
+                parent_module = self
+                (class << cls; self; end).send(:define_method, :depend) do |file|
+                  parent_module::Depend << file
+
+                  def self.const_missing(name)
+                    const_set(name, Class.new)
+                  end
+
+                  def self.reloadable(cls, &blk)
+                    cls.class_eval(&blk)
+                  end
+
+                  eval(File.read('artists/' + file + '.rb'))
+                end
+                cls.class_eval(&blk)
+              end
+
               eval(File.read(file_name))
             end
 
-            klass = m.const_get(m.constants.first)
+            klass = m.const_get(m.constants[1])
             @mtime = mtime 
             @instance = klass.new
             @on_load[@instance]

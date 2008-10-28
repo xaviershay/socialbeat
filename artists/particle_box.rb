@@ -1,9 +1,5 @@
-class self::ParticleBox < SocialBeat::Artist
-  class Particle
-    attr_accessor :position
-    attr_accessor :last_position
-    attr_accessor :mass
-  end
+reloadable self::ParticleBox do
+  depend('particle')
 
   def gaussian_rand
     u1 = 0
@@ -23,7 +19,7 @@ class self::ParticleBox < SocialBeat::Artist
       :particles       => [100, 5, 25],
       :click_particles => [60, 5, 15]
     }.each_pair do |key, (n, stddev, median)|
-      env[key] ||= (0..n).collect do |i|
+      env[key] = (0..n).collect do |i|
         p = Particle.new
         r = gaussian_rand[0] * stddev + median
         a = rand * 2 * Math::PI
