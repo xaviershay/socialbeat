@@ -30,15 +30,18 @@ class CodeLoader
   end
   
   def self.const_missing(name)
-    @@m.const_get(@@m.constants[1]).const_get(name)
+    @@m.const_get((@@m.constants - ["Depend"]).first).const_get(name)
   end
 
   protected
     def load_file(file_name)
       if File.exists?(file_name)
-        if (mtime = File.mtime(file_name).to_f) > @mtime
+        @changed_file = (@files || [file_name]).detect {|file| File.mtime(file).to_f > @mtime }
+
+        if @changed_file
+          mtime = File.mtime(@changed_file).to_f
           begin
-            @@m = m = Module.new
+            @@m = @m = m = Module.new
             m.instance_eval do
               self::const_set('Depend', [])
 
@@ -49,7 +52,7 @@ class CodeLoader
               def self.reloadable(cls, &blk)
                 parent_module = self
                 (class << cls; self; end).send(:define_method, :depend) do |file|
-                  parent_module::Depend << file
+                  parent_module::Depend << 'artists/' + file + '.rb' 
 
                   def self.const_missing(name)
                     const_set(name, Class.new)
@@ -67,8 +70,9 @@ class CodeLoader
               eval(File.read(file_name))
             end
 
-            klass = m.const_get(m.constants[1])
+            klass = m.const_get((m.constants - ["Depend"]).first)
             @mtime = mtime 
+            @files = [file_name] + m::Depend
             @instance = klass.new
             @on_load[@instance]
           rescue NameError, SyntaxError, LoadError, Errno::ENOENT => e

@@ -48,8 +48,9 @@ reloadable self::ParticleBox do
     (0..2).collect {|i| v1[i].send(operator, v2[i]) }
   end
 
-  Z = 2
-  POINT = 0
+  self::Z = 2
+  self::POINT = 0
+
   def update(events, canvas, env, u)
     events.each do |event|
       if event.data.is_a?(CoreMIDI::Events::NoteOn)
